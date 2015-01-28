@@ -10,17 +10,14 @@ class Board {
 public:
 	string display ();
 	void Xturn();
-	void Yturn();
+	void Oturn();
 
 	int gameOver();
 };
 
 
 string Board::display(){
-	char ch1 = cells[0];
-	char ch2 = cells[1];
-	string str = string()+cells[0]+"|"+cells[1]+"|"+ cells[2] + "\n" + cells[3]+"|" + cells[4] +"|"+ cells[5] + "\n" + cells[6]+"|" + cells[7]+"|" + cells[8] + "\n";
-	return str;
+	return string()+cells[0]+"|"+cells[1]+"|"+ cells[2] + "\n" + cells[3]+"|" + cells[4] +"|"+ cells[5] + "\n" + cells[6]+"|" + cells[7]+"|" + cells[8] + "\n";
 }
 void Board::playCell(string turn, int place){
 	if (place == 0){
@@ -48,8 +45,8 @@ void Board::Xturn(){
 		Xturn();
 	}
 }
-void Board::Yturn(){
-	cout << "It is Y's turn please enter your cell \n";
+void Board::Oturn(){
+	cout << "It is O's turn please enter your cell \n";
 	cout << "Enter the row number (1-3) followed by the column number (1-3)\n";
 	cout << "For example 1 2 would be the middle of the top row\n";
 	int row, col;
@@ -57,12 +54,12 @@ void Board::Yturn(){
 	int place = (row-1)*3+col-1;
 	if (row>3||col>3||row<1||col<1){
 		cout << "please eneter a valid row and column\n";
-		Yturn();
+		Oturn();
 	} else if (cells[place] == 32){
-		playCell("Y", (row-1)*3+col-1);
+		playCell("O", (row-1)*3+col-1);
 	} else {
 		cout << "please enter an empty cell\n";
-		Yturn();
+		Oturn();
 	}
 }
 int Board::gameOver(){
@@ -104,7 +101,7 @@ int main () {
 		board.Xturn();
 		cout << board.display();
 		if (board.gameOver() ==0) {
-			board.Yturn();
+			board.Oturn();
 			cout << board.display();
 		}
 
@@ -112,7 +109,7 @@ int main () {
 	if (board.gameOver() == 1){
 		cout << "\n" << "X wins";
 	} else if (board.gameOver() == 2){
-		cout << "\n" << "Y wins";
+		cout << "\n" << "O wins";
 	} else if (board.gameOver() == 3){
 		cout << "\n" << "Its a tie";
 	}
