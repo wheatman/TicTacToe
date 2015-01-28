@@ -5,13 +5,15 @@ using namespace std;
 
 class Board {
 	string cells = "         ";
-	void playCell(string turn, int place);
+	int firstTurn=1;
 	vector<string> rows ();
 public:
+	void playCell(string turn, int place);
 	string display ();
 	void Xturn();
 	void Oturn();
-
+	void CompTurn();
+	int oneTurnAway(string letter);
 	int gameOver();
 };
 
@@ -62,6 +64,74 @@ void Board::Oturn(){
 		Oturn();
 	}
 }
+void Board::CompTurn(){
+	if (firstTurn==1){
+		firstTurn = 0;
+		if (cells[4] ==32){
+			playCell("O", 4);
+		} else {
+			playCell("O", 0);
+		}
+	} else {
+		int placeO = oneTurnAway("O");
+		int placeX = oneTurnAway("X");
+		// first priority win
+		if ( placeO >=0){
+			playCell("O", placeO);
+		} // second priority don't lose
+		else if (placeX >= 0){
+			playCell("O", placeX);
+		} // third priority go in the center
+		else if (cells[4]==32){
+			playCell("O", 4);
+		} else {
+			for (int i = 0; i < 4; i ++){
+				if (cells[2*i+1] == 32){
+					playCell("O", 2*i+1);
+					break;
+				}
+			}
+		}
+	}
+	
+}
+// return cell to go in if one turn away, return -1 else
+int Board::oneTurnAway(string letter){
+	vector<string> row = rows();
+	int count = 0;
+	int rowNumber = 0;
+	for (auto & element : row) {
+		count = 0;
+		for (int i = 0; i < 3; i ++){
+			if (element[i] == letter[0]){
+				count++;
+			} else if (element[i] != 32){
+				break;
+			}
+		}
+		if (count == 2){
+			for (int i = 0; i < 3; i ++){
+				if (element[i] == 32){
+					if (rowNumber<3){
+						return rowNumber*3+i;
+					} else if (rowNumber<6){
+						return rowNumber-3+3*i;
+					} else if (rowNumber == 6){
+						return (i+1)*(i+1)-1;
+					} else if (rowNumber = 7){
+						return (i+1)*2;
+					}
+					return 1;
+				}
+			}
+			
+		}
+		rowNumber++;
+	}
+	return -1;
+
+
+}
 int Board::gameOver(){
 	int empty = 0;
 	for (int i = 0; i < 9; i ++){
@@ -93,31 +163,38 @@ vector<string> Board::rows(){
 	rows.push_back(string()+cells[2]+ cells[4]+ cells[6]);
 	return rows;
 }
-
 int main () {
-	Board board;
-	cout << board.display()<< "\n";
-	while (board.gameOver() == 0 ){
-		board.Xturn();
-		cout << board.display();
-		if (board.gameOver() ==0) {
-			board.Oturn();
-			cout << board.display();
+	string again = "y";
+	while(again.compare("y")==0){
+		Board board;
+		cout << board.display()<< "\n";
+		// board.playCell("X", 2);
+		// cout << board.display()<< "\n";
+		// board.playCell("X", 4);
+		// cout << board.display()<< "\n";
+		// board.oneTurnAway("X");
+		// cout << board.display()<< "\n";
+
+		while (board.gameOver() == 0 ){
+			board.Xturn();
+			cout << board.display()<< "\n";
+			if (board.gameOver() ==0) {
+				board.CompTurn();
+				cout << board.display()<<"\n";
+			}
+
 		}
-
+		if (board.gameOver() == 1){
+			cout << "\n" << "You win\n";
+		} else if (board.gameOver() == 2){
+			cout << "\n" << "You lose\n";
+		} else if (board.gameOver() == 3){
+			cout << "\n" << "Its a tie\n";
+		}
+		cout << "would you like to play again? (y/n) \n";
+		cin >> again;
 	}
-	if (board.gameOver() == 1){
-		cout << "\n" << "X wins";
-	} else if (board.gameOver() == 2){
-		cout << "\n" << "O wins";
-	} else if (board.gameOver() == 3){
-		cout << "\n" << "Its a tie";
-	}
 
-	// vector<string> rows = board.rows();
-	// for (auto & element : rows) {
- //    	cout << element<< "\n";
-	// }
 	return 0;
 }
 
