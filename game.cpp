@@ -7,13 +7,14 @@ class Board {
 	string cells = "         ";
 	int firstTurn=1;
 	vector<string> rows ();
-public:
 	void playCell(string turn, int place);
+	int oneTurnAway(string letter);
+	int startCenter;
+public:
 	string display ();
 	void Xturn();
 	void Oturn();
 	void CompTurn();
-	int oneTurnAway(string letter);
 	int gameOver();
 };
 
@@ -38,7 +39,7 @@ void Board::Xturn(){
 	cin >> row >> col;
 	int place = (row-1)*3+col-1;
 	if (row>3||col>3||row<1||col<1){
-		cout << "please eneter a valid row and column\n";
+		cout << "please enter a valid row and column\n";
 		Xturn();
 	} else if (cells[place] == 32){
 		playCell("X", (row-1)*3+col-1);
@@ -55,7 +56,7 @@ void Board::Oturn(){
 	cin >> row >> col;
 	int place = (row-1)*3+col-1;
 	if (row>3||col>3||row<1||col<1){
-		cout << "please eneter a valid row and column\n";
+		cout << "please enter a valid row and column\n";
 		Oturn();
 	} else if (cells[place] == 32){
 		playCell("O", (row-1)*3+col-1);
@@ -65,12 +66,17 @@ void Board::Oturn(){
 	}
 }
 void Board::CompTurn(){
+	int played = 0;
 	if (firstTurn==1){
 		firstTurn = 0;
 		if (cells[4] ==32){
 			playCell("O", 4);
+			played = 1;
+			startCenter=0;
 		} else {
 			playCell("O", 0);
+			played = 1;
+			startCenter = 1;
 		}
 	} else {
 		int placeO = oneTurnAway("O");
@@ -78,19 +84,48 @@ void Board::CompTurn(){
 		// first priority win
 		if ( placeO >=0){
 			playCell("O", placeO);
+			played = 1;
 		} // second priority don't lose
 		else if (placeX >= 0){
 			playCell("O", placeX);
+			played = 1;
 		} // third priority go in the center
 		else if (cells[4]==32){
 			playCell("O", 4);
+			played = 1;
 		} else {
-			for (int i = 0; i < 4; i ++){
-				if (cells[2*i+1] == 32){
-					playCell("O", 2*i+1);
-					break;
+			if (startCenter==0){
+				for (int i = 0; i < 4; i ++){
+					if (cells[2*i+1] == 32){
+						playCell("O", 2*i+1);
+						played = 1;
+						break;
+					} 
+				}
+			} else {
+				if (cells[0] == 32){
+					playCell("O",0);
+					played = 1;
+				} else if (cells[2] == 32){
+					playCell("O", 2);
+					played = 1;
+				} else if (cells[6] == 32){
+					playCell("O", 6);
+					played = 1;
+				} else if (cells[8] == 32){
+					playCell("O", 8);
+					played = 1;
 				}
 			}
+		} if (played == 0){
+			for (int i = 0; i < 9; i ++){
+				if (cells[i] == 32){
+					playCell("O", i);
+					int played = 1;
+					break;
+				} 
+			}
+
 		}
 	}
 	
@@ -133,14 +168,6 @@ int Board::oneTurnAway(string letter){
 
 }
 int Board::gameOver(){
-	int empty = 0;
-	for (int i = 0; i < 9; i ++){
-		if (cells[i] == 32){
-			empty++;
-		}
-	} if (empty == 0){
-		return 3;
-	}
 	vector<string> row = rows();
 	for (auto & element : row) {
 		if (element.compare("XXX") == 0){
@@ -149,6 +176,15 @@ int Board::gameOver(){
 			return 2;
 		}
 	}
+	int empty = 0;
+	for (int i = 0; i < 9; i ++){
+		if (cells[i] == 32){
+			empty++;
+		}
+	} if (empty == 0){
+		return 3;
+	}
+
 	return 0;
 }
 vector<string> Board::rows(){
@@ -168,13 +204,6 @@ int main () {
 	while(again.compare("y")==0){
 		Board board;
 		cout << board.display()<< "\n";
-		// board.playCell("X", 2);
-		// cout << board.display()<< "\n";
-		// board.playCell("X", 4);
-		// cout << board.display()<< "\n";
-		// board.oneTurnAway("X");
-		// cout << board.display()<< "\n";
-
 		while (board.gameOver() == 0 ){
 			board.Xturn();
 			cout << board.display()<< "\n";
